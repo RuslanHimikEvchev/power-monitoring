@@ -1,13 +1,13 @@
 redis:
-  host: localhost
-  port: 6379
-http_bind: "0.0.0.0:8080"
+  host: localhost # redis hos
+  port: 6379 # redis port
+http_bind: "0.0.0.0:8080" # bind address + port
 http_security:
-  user: password
+  user: password # login and password for http management
 telegram_webhook_pattern: "https://domain.tld/%s/webhook" # %s will be replaced bot_identity
-config_reread_interval: 3600
+config_reread_interval: 3600 # autoupdate configuration file interval
 complexes:
-  - key: "uniq_key_complex"
+  - key: "key_complex"
     name: "My Awesome Home"
     bot_token: "my_awesome_telegram_bot_token"
     bot_channels: [12345,-12345]
