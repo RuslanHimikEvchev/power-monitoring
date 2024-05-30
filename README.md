@@ -6,23 +6,37 @@
    Для встановлення та налаштування бекенду, нам треба Go 1.21 або вище та Redis Server. Клонуємо репозиторій в потрібну нам директорію, та виконуємо команду  
    `go mod tidy`  
    Після цього можемо зібрати проєкт командою\
-   `CGO_ENABLED=0 go build -o build/monitor -a -installsuffix cgo -ldflags '-s' main.go`  '
+   `CGO_ENABLED=0 go build -o build/monitor -a -installsuffix cgo -ldflags '-s' main.go`
 2. Перед запуском необхідно написати базову конфігурацію бекенду. Приклад конфігурації описаний у файлі config-example.yml
-3. Надсилати дані в бекенд можна будь-яким способом, відправивши HTTP запит  
+3. Надсилати дані в бекенд можна будь-яким способом, відправивши HTTP запит\
+   Онлайн моніторинг
    ```http 
    POST https://top-domain.tld/direct-wire 
    ```
-
+   Всі поля обов'язкові
    ```json lines
    {
    "k": "key_complex",  
-   "n": "name of power line",  
-   "i": 10,  
+   "n": "name of power line",
    "h": true,  
    "p": true,  
    "m": "MAC of device or another uniq id"  
    }
    ```
+   Моніторинг за затримкою сповіщення
+   ```http 
+   POST https://top-domain.tld/timeout-wire 
+   ```
+   Всі поля обов'язкові
+   ```json lines
+   {
+   "k": "key_complex",  
+   "n": "name of power line",
+   "i": 60,
+   "m": "MAC of device or another uniq id"  
+   }
+   ```
+   
    
    Де:\
    **k - ключ будинку**\
@@ -31,4 +45,3 @@
    **h - чи виконується моніторинг струму напряму**\
    **p - чи є струм в лінії**\
    **m - унікальний ідентифікатор лінії**
-4.  Також в репозиторії є приклад для збірки прошивки, використовуючи ESPHome та TTGO T-Beam плату розробки. Ви можете використовувати будь-яку плату розробки, або надсилати запити на бекенд в будь-який інший спосіб 

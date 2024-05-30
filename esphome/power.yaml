@@ -31,7 +31,7 @@ interval:
   - interval: "60s"
     then:
       - http_request.post:
-          url: "https://domain.tld/timeout-api"
+          url: "https://domain.tld/timeout-wire"
           verify_ssl: false
           headers:
             Content-Type: application/json

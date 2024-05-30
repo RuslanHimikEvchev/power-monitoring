@@ -193,7 +193,7 @@ func main() {
 		c.JSON(200, gin.H{"message": "ok"})
 	})
 
-	r.POST("/timeout-api", func(context *gin.Context) {
+	r.POST("/timeout-wire", func(context *gin.Context) {
 		d, err := parseDevice(context)
 
 		if err != nil {
