@@ -1,0 +1,1 @@
+CGO_ENABLED=0 go build -o build/monitor -a -installsuffix cgo -ldflags '-s' main.go

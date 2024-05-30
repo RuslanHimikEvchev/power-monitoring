@@ -1,0 +1,125 @@
+external_components:
+  - source: ./axp/components
+    components: [ axp2101 ]
+esphome:
+  name: esp-32-local
+
+esp32:
+  board: ttgo-t-beam
+  framework:
+    type: arduino
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: Europe/Kyiv
+    servers:
+      - 0.pool.ntp.org
+      - 1.pool.ntp.org
+      - 2.pool.ntp.org
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+binary_sensor:
+  platform: gpio
+  pin:
+    number: GPIO19
+    mode:
+      input: true
+      pullup: true
+  name: Button
+  id: button
+sensor:
+  - platform: axp2101
+    model: M5CORE2
+    brightness: 100%
+    address: 0x34
+    update_interval: 5s
+    battery_level:
+      name: "Battery Level"
+      id: level
+    battery_voltage:
+      name: "Battery Voltage"
+      id: voltage
+    battery_charging:
+      name: "Battery Charging"
+      id: battery_charging
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address
+      id: wifi_ip
+      address_0:
+        name: ESP IP Address 0
+      address_1:
+        name: ESP IP Address 1
+      address_2:
+        name: ESP IP Address 2
+      address_3:
+        name: ESP IP Address 3
+      address_4:
+        name: ESP IP Address 4
+    mac_address:
+      name: ESP Mac Wifi Address
+      id:   text_sensor_mac_address
+web_server:
+  port: 80
+http_request:
+  useragent: esphome/device
+  timeout: 1s
+wifi:
+  fast_connect: true
+  ssid: "reserve"
+  password: "kaboolka"
+  ap:
+    ssid: "Esp-32-Local Fallback Hotspot"
+    password: "aQK7oRcyfSVB"
+font:
+  - file: 'Comic Sans MS.ttf'
+    id: font1
+    size: 12
+  - file: 'Comic Sans MS.ttf'
+    id: font2
+    size: 10
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    update_interval: 2s
+    lambda: |-
+      char buf[256];
+      sprintf(buf,  "USB On %d", id(battery_charging).state);
+      it.print(0, 0, id(font1), id(wifi_ip).state.c_str());
+      it.print(0, 14, id(font1), ((std::string) buf).c_str());
+      it.strftime(0, 30, id(font2), "%Y-%m-%d %H:%M", id(sntp_time).now());
+      it.printf(0, 44, id(font2), "V %f", id(voltage).state);
+interval:
+  - interval: "5s"
+    then:
+      - http_request.post:
+          url: "https://domain.tld/direct-wire"
+          verify_ssl: false
+          headers:
+            Content-Type: application/json
+          json: |-
+            root["k"] = "your-house-key";
+            root["n"] = "Power line name";
+            root["i"] = 10;
+            root["h"] = true;
+            root["p"] = id(battery_charging).state;
+            root["m"] = id(text_sensor_mac_address).state;
+          on_response:
+            then:
+              - logger.log:
+                  format: "Response status: %d, Duration: %u ms"
+                  args:
+                    - status_code
+                    - duration_ms

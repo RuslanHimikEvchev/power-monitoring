@@ -1,0 +1,50 @@
+esphome:
+  name: power-line-1
+esp8266:
+  board: nodemcuv2
+# Enable logging
+logger:
+  level: VERBOSE
+  baud_rate: 250000
+text_sensor:
+  - platform: wifi_info
+    mac_address:
+      name: ESP Mac Wifi Address
+      id:   text_sensor_mac_address
+
+# Enable Home Assistant API
+http_request:
+  useragent: esphome/device
+  timeout: 10s
+api:
+ota:
+wifi:
+  ssid: "WWW24"
+  password: "380632105522Ab"
+  ap:
+    ssid: "local"
+    password: "12345678"
+web_server:
+  port: 80
+captive_portal:
+interval:
+  - interval: "60s"
+    then:
+      - http_request.post:
+          url: "https://domain.tld/timeout-api"
+          verify_ssl: false
+          headers:
+            Content-Type: application/json
+          json: |-
+            root["k"] = "your-house-key";
+            root["n"] = "Power line name";
+            root["i"] = 60;
+            root["m"] = id(text_sensor_mac_address).state;
+          on_response:
+            then:
+              - logger.log:
+                  format: "Response status: %d, Duration: %u ms"
+                  args:
+                    - status_code
+                    - duration_ms
+    
