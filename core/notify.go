@@ -67,7 +67,7 @@ func (n *Notifier) Send(notification Notification) {
 		return
 	}
 
-	if notification.Device.NotificationEnabled == false {
+	if notification.Device.NotificationEnabled == false && notification.Device.HasDirectWire == true {
 		return
 	}
 
